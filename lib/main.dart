@@ -1,9 +1,9 @@
+import 'package:bill_app/pages/profile-page.dart';
 import 'package:bill_app/pages/splash-screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-
 import 'pages/ablum-sanpham.dart';
 import 'pages/bill-screen.dart';
 import 'pages/cart-page.dart';
@@ -46,7 +46,8 @@ class MyApp extends StatelessWidget {
           theme: ThemeData(
             primarySwatch: Colors.blue,
           ),
-          home: const TimerPage(),
+          home: const CartPage(),
+          // home: Details_Page(),
           routes: {
             '/register-page': (context) => const RegisterPage(),
             '/login-page': (context) => const LoginPageNail(),

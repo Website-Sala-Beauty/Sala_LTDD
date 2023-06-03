@@ -81,7 +81,10 @@ flutter:
   - assets/images/bottomAppBar-images/
   - assets/images/function-home-images/
   
-  
+  fonts:
+    - family: MajoraBold
+      fonts:
+        - asset: assets/fonts/majora_bold.ttf
 
 
   #   - images/a_dot_ham.jpeg
