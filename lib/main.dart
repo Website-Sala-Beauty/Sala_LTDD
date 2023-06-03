@@ -46,8 +46,8 @@ class MyApp extends StatelessWidget {
           theme: ThemeData(
             primarySwatch: Colors.blue,
           ),
-          // home: const TimerPage(),
-          home: Details_Page(),
+          home: const CartPage(),
+          // home: Details_Page(),
           routes: {
             '/register-page': (context) => const RegisterPage(),
             '/login-page': (context) => const LoginPageNail(),
