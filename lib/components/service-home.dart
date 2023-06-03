@@ -1,6 +1,7 @@
 // ignore: camel_case_types
 import 'package:bill_app/models/function-home.dart';
 import 'package:bill_app/pages/ablum-sanpham.dart';
+import 'package:bill_app/pages/bill-screen.dart';
 import 'package:bill_app/pages/cart-page.dart';
 import 'package:bill_app/pages/resources/coming-soon.dart';
 import 'package:bill_app/pages/statistics-screen.dart';
@@ -16,7 +17,7 @@ class serviceHome extends StatelessWidget {
     List<FunctionHome> listFunc = [
       FunctionHome(
           id: 9,
-          name: 'Hóa đơn',
+          name: 'Dịch vụ',
           image: 'assets/images/function-home-images/menudichvu.jpg'),
       FunctionHome(
           id: 10,
@@ -24,7 +25,7 @@ class serviceHome extends StatelessWidget {
           image: 'assets/images/function-home-images/ablum-sanpham.jpg'),
       FunctionHome(
           id: 11,
-          name: 'Thống kê',
+          name: 'Đặt lịch',
           image: 'assets/images/function-home-images/datlich.jpg'),
       FunctionHome(
           id: 12,
@@ -90,14 +91,14 @@ class serviceHome extends StatelessWidget {
                                     .routerName); // AblumSanPhamPage.routeName
                             break;
                           }
-                        case 11:
-                          {
-                            Navigator.pushNamed(
-                                context,
-                                StatisticsPage
-                                    .routerName); // StatisticsPage.routeName
-                            break;
-                          }
+                        // case 11:
+                        //   {
+                        //     Navigator.pushNamed(
+                        //         context,
+                        //         StatisticsPage
+                        //             .routerName); // StatisticsPage.routeName
+                        //     break;
+                        //   }
                         case 14:
                           {
                             Navigator.pushNamed(

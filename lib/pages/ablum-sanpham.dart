@@ -47,7 +47,7 @@ class SanPham extends StatelessWidget {
   void addCart(String name, String image) async {
     final url = Uri.https(
         'salabeauty-42a26-default-rtdb.asia-southeast1.firebasedatabase.app',
-        'Product.json');
+        'tb_Cart.json');
     final respone = await http.post(url,
         body: json.encode({
           'image': image,
@@ -83,6 +83,10 @@ class SanPham extends StatelessWidget {
           trailing: IconButton(
             onPressed: () {
               addCart(name ?? '', image ?? '');
+              SnackBar snackBar = const SnackBar(
+                content: Text('Thêm vào giỏ hàng thành công'),
+              );
+              ScaffoldMessenger.of(context).showSnackBar(snackBar);
             },
             icon: const Icon(Icons.shopping_cart_outlined),
           ),

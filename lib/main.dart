@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import 'pages/ablum-sanpham.dart';
+import 'pages/bill-screen.dart';
 import 'pages/cart-page.dart';
 import 'pages/home-screen.dart';
 import 'pages/login-page-salanail.dart';
@@ -51,7 +52,7 @@ class MyApp extends StatelessWidget {
             '/login-page': (context) => const LoginPageNail(),
             '/splash': (context) => const TimerPage(),
             '/home-page': (context) => const HomePage(),
-            //  '/bill-page': (context) => const BillPage(),
+            '/bill-page': (context) => const BillPage(),
             '/album-page': (context) => AblumSanPhamPage(),
             '/cart-page': (context) => const CartPage(),
             '/statistics-page': (context) => const StatisticsPage(),

@@ -6,7 +6,7 @@ import '../components/master-page.dart';
 import '../components/service-home.dart';
 
 class HomePage extends StatefulWidget {
-    static const routerName = '/home-page';
+  static const routerName = '/home-page';
 
   const HomePage({super.key});
 
@@ -20,15 +20,17 @@ class _HomePageState extends State<HomePage> {
     return MasterPage(
       title: 'Home Page',
       isBack: false,
-      body: SingleChildScrollView(
-        child: SizedBox(
-          height: MediaQuery.of(context).size.height / 1.1,
-          child: Column(
-            children: const [
-              CarouseHome(),
-              itemHome(),
-              serviceHome(),
-            ],
+      body: Padding(
+        padding: EdgeInsets.zero,
+        child: SingleChildScrollView(
+          child: SizedBox(
+            child: Column(
+              children: const [
+                CarouseHome(),
+                itemHome(),
+                serviceHome(),
+              ],
+            ),
           ),
         ),
       ),

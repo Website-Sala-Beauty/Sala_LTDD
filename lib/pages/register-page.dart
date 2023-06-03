@@ -23,8 +23,11 @@ class _RegisterPageState extends State<RegisterPage> {
   bool isCheckPhoneNumber = false;
   bool isCheckName = false;
   bool isCheckPassword = false;
-  bool isCheckPasswordConfirm = true;
+  bool isCheckPasswordConfirm = false;
   bool isCheckEmail = false;
+  bool passwordText = true;
+  bool passwordTextConfirm = true;
+  bool isLoading = true;
 
   TextEditingController phoneNumberController = TextEditingController();
   TextEditingController userNameController = TextEditingController();
@@ -33,12 +36,11 @@ class _RegisterPageState extends State<RegisterPage> {
   TextEditingController confirmPasswordController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
-  bool checkConfirmPassword(String password, String confirmPassword) {
-  if (password != confirmPassword) {
-    return false;
+  @override
+  void initState() {
+    super.initState();
   }
-  
-}
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -152,11 +154,40 @@ class _RegisterPageState extends State<RegisterPage> {
                                         const SizedBox(
                                           height: 10,
                                         ),
-                                        CustomTextFiled(
+                                        TextField(
+                                          obscureText: passwordText,
                                           controller: passwordController,
-                                          text: "Mật khẩu ",
-                                          obscureText: true,
+                                          textInputAction: TextInputAction.done,
+                                          onEditingComplete: () {
+                                            // String userName =
+                                            //     userNameController.text;
+                                            // String password =
+                                            //     passwordController.text;
+                                            // checkLogin(userName, password);
+                                          },
+                                          decoration: InputDecoration(
+                                            suffixIcon: IconButton(
+                                              icon: Icon(
+                                                passwordText
+                                                    ? Icons.visibility_off
+                                                    : Icons.visibility,
+                                                color: const Color.fromARGB(
+                                                    255, 93, 166, 173),
+                                              ),
+                                              onPressed: () {
+                                                setState(() {
+                                                  passwordText = !passwordText;
+                                                });
+                                              },
+                                            ),
+                                            labelText: 'Password',
+                                          ),
                                         ),
+                                        // CustomTextFiled(
+                                        //   controller: passwordController,
+                                        //   text: "Mật khẩu",
+                                        //   obscureText: true,
+                                        // ),
                                         const SizedBox(
                                           height: 7,
                                         ),
@@ -165,7 +196,8 @@ class _RegisterPageState extends State<RegisterPage> {
                                             Text(
                                               "Mật khẩu phải chứa ít nhất 6 kí tự.",
                                               style: TextStyle(
-                                                  color: AppColor.red),
+                                                  color: Color.fromARGB(
+                                                      255, 10, 10, 10)),
                                             ),
                                           ],
                                         ),
@@ -189,11 +221,41 @@ class _RegisterPageState extends State<RegisterPage> {
                                         const SizedBox(
                                           height: 10,
                                         ),
-                                        CustomTextFiled(
+                                        TextField(
+                                          obscureText: passwordTextConfirm,
                                           controller: confirmPasswordController,
-                                          text: "Xác nhận mật khẩu ",
-                                          obscureText: true,
+                                          textInputAction: TextInputAction.done,
+                                          onEditingComplete: () {
+                                            // String userName =
+                                            //     userNameController.text;
+                                            // String password =
+                                            //     passwordController.text;
+                                            // checkLogin(userName, password);
+                                          },
+                                          decoration: InputDecoration(
+                                            suffixIcon: IconButton(
+                                              icon: Icon(
+                                                passwordTextConfirm
+                                                    ? Icons.visibility_off
+                                                    : Icons.visibility,
+                                                color: const Color.fromARGB(
+                                                    255, 93, 166, 173),
+                                              ),
+                                              onPressed: () {
+                                                setState(() {
+                                                  passwordTextConfirm =
+                                                      !passwordTextConfirm;
+                                                });
+                                              },
+                                            ),
+                                            labelText: 'Xác nhận mật khẩu',
+                                          ),
                                         ),
+                                        // CustomTextFiled(
+                                        //   controller: confirmPasswordController,
+                                        //   text: "Xác nhận mật khẩu ",
+                                        //   obscureText: true,
+                                        // ),
                                         const SizedBox(
                                           height: 7,
                                         ),
@@ -202,7 +264,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                               MainAxisAlignment.start,
                                           children: [
                                             Visibility(
-                                              visible: !isCheckPasswordConfirm ,
+                                              visible: isCheckPasswordConfirm,
                                               child: const Text(
                                                 "Mật khẩu không khớp",
                                                 style: TextStyle(
@@ -218,15 +280,139 @@ class _RegisterPageState extends State<RegisterPage> {
                                             Expanded(
                                               child: TextButton(
                                                   onPressed: () async {
-                                                    if (phoneNumberController
-                                                            .text.isEmpty ||
-                                                        userNameController
-                                                            .text.isEmpty ||
-                                                        passwordController
-                                                            .text.isEmpty ||
-                                                        emailController
-                                                            .text.isEmpty) {
+                                                    String phone =
+                                                        phoneNumberController
+                                                            .text;
+                                                    String name =
+                                                        userNameController.text;
+                                                    String pass =
+                                                        passwordController.text;
+                                                    String email =
+                                                        emailController.text;
+                                                    String password =
+                                                        passwordController.text;
+                                                    String passConfirm =
+                                                        confirmPasswordController
+                                                            .text;
+
+                                                    if (_formKey.currentState!
+                                                            .validate() &&
+                                                        checkNull(phone, name,
+                                                            pass, email)) {
+                                                      // Hàm check mail có đúng định dạng hay không
+
+                                                      if (checkPassword(
+                                                          password,
+                                                          passConfirm)) {
+                                                        isCheckPasswordConfirm =
+                                                            true;
+                                                        if (checkEmail(email)) {
+                                                          try {
+                                                            final userCredentials =
+                                                                await _firebase.createUserWithEmailAndPassword(
+                                                                    email:
+                                                                        emailController
+                                                                            .text,
+                                                                    password:
+                                                                        passwordController
+                                                                            .text);
+                                                            setState(() {
+                                                              isLoading = false;
+                                                            });
+                                                            await FirebaseFirestore
+                                                                .instance
+                                                                .collection(
+                                                                    'tb_User')
+                                                                .doc(
+                                                                    userCredentials
+                                                                        .user!
+                                                                        .uid)
+                                                                .set({
+                                                              'name':
+                                                                  userNameController
+                                                                      .text,
+                                                              'email':
+                                                                  emailController
+                                                                      .text,
+                                                              'phone':
+                                                                  phoneNumberController
+                                                                      .text,
+                                                              'password':
+                                                                  passwordController
+                                                                      .text,
+                                                              'image':
+                                                                  userNameController
+                                                                      .text[0]
+                                                                      .toUpperCase(),
+                                                            });
+                                                            ScaffoldMessenger
+                                                                    .of(context)
+                                                                .showSnackBar(
+                                                              const SnackBar(
+                                                                content: Text(
+                                                                    'Đăng kí thành công'),
+                                                              ),
+                                                            );
+                                                            Navigator.pushNamed(
+                                                                context,
+                                                                LoginPageNail
+                                                                    .routerName);
+                                                          } on FirebaseAuthException catch (e) {
+                                                            if (e.code ==
+                                                                'weak-password') {
+                                                              ScaffoldMessenger
+                                                                      .of(context)
+                                                                  .showSnackBar(
+                                                                const SnackBar(
+                                                                  content: Text(
+                                                                      "Mật khẩu phải chứa ít nhất 6 kí tự."),
+                                                                ),
+                                                              );
+
+                                                              // print(
+                                                              //     'The password provided is too weak.');
+                                                            } else if (e.code ==
+                                                                'email-already-in-use') {
+                                                              ScaffoldMessenger
+                                                                      .of(context)
+                                                                  .showSnackBar(
+                                                                const SnackBar(
+                                                                  content: Text(
+                                                                      "Email đã tồn tại."),
+                                                                ),
+                                                              );
+                                                            }
+                                                            setState(() {
+                                                              isLoading = true;
+                                                            });
+                                                          } catch (e) {
+                                                            print(e);
+                                                          }
+                                                        } else {
+                                                          ScaffoldMessenger.of(
+                                                                  context)
+                                                              .showSnackBar(
+                                                            const SnackBar(
+                                                              content: Text(
+                                                                  "Email không đúng định dạng."),
+                                                            ),
+                                                          );
+                                                        }
+                                                      } else {
+                                                        ScaffoldMessenger.of(
+                                                                context)
+                                                            .showSnackBar(
+                                                          const SnackBar(
+                                                            content: Text(
+                                                                "Mật khẩu không khớp."),
+                                                          ),
+                                                        );
+                                                      }
+
+                                                      // kiểm tra các điều kiện nhập vào có đúng hay không vd:
+                                                    } else {
                                                       setState(() {
+                                                        isLoading = true;
                                                         isCheckPhoneNumber =
                                                             phoneNumberController
                                                                 .text.isEmpty;
@@ -240,130 +426,42 @@ class _RegisterPageState extends State<RegisterPage> {
                                                             emailController
                                                                 .text.isEmpty;
                                                       });
-                                                    } else {
-                                                      //check mail
-                                                      if (!emailController.text
-                                                          .contains('@')) {
-                                                        setState(() {
-                                                          isCheckPhoneNumber =
-                                                              phoneNumberController
-                                                                  .text.isEmpty;
-                                                          isCheckName =
-                                                              userNameController
-                                                                  .text.isEmpty;
-                                                          isCheckPassword =
-                                                              passwordController
-                                                                  .text.isEmpty;
-                                                          isCheckEmail =
-                                                              emailController
-                                                                  .text.isEmpty;
-                                                        });
-                                                        ScaffoldMessenger.of(
-                                                                context)
-                                                            .showSnackBar(
-                                                          const SnackBar(
-                                                            content: Text(
-                                                                'Email không hợp lệ!'),
-                                                          ),
-                                                        );
-                                                        // check password
-                                                      } else {
-                                                        try {
-                                                          //firebase auth
-                                                          final userCredentials =
-                                                              await _firebase.createUserWithEmailAndPassword(
-                                                                  email:
-                                                                      emailController
-                                                                          .text,
-                                                                  password:
-                                                                      passwordController
-                                                                          .text
-                                                                          .trim());
-                                                          // userCredentials.user!.uid  user tại sao lỗi
-
-                                                          await FirebaseFirestore
-                                                              .instance
-                                                              .collection(
-                                                                  'tb_User')
-                                                              .doc(
-                                                                  userCredentials
-                                                                      .user!
-                                                                      .uid)
-                                                              .set({
-                                                            'name':
-                                                                userNameController
-                                                                    .text,
-                                                            'email':
-                                                                emailController
-                                                                    .text,
-                                                            'phone':
-                                                                phoneNumberController
-                                                                    .text,
-                                                            'password':
-                                                                passwordController
-                                                                    .text,
-                                                            'image':
-                                                                userNameController
-                                                                    .text[0]
-                                                                    .toUpperCase(),
-                                                          });
-
-                                                          Navigator.push(
-                                                              context,
-                                                              MaterialPageRoute(
-                                                                  builder:
-                                                                      (context) =>
-                                                                          const LoginPageNail()));
-                                                        } on FirebaseAuthException catch (err) {
-                                                          if (err.code ==
-                                                              'weak-password') {
-                                                            print(
-                                                                'Mật khẩu phải chứa ít nhất 6 kí tự.');
-                                                          } else if (err.code ==
-                                                              'email-already-in-use') {
-                                                            ScaffoldMessenger
-                                                                    .of(context)
-                                                                .showSnackBar(
-                                                              const SnackBar(
-                                                                content: Text(
-                                                                    'Email đã tồn tại!'),
-                                                              ),
-                                                            );
-                                                          }
-                                                          // firebase store
-                                                        } catch (err) {
-                                                          print(err);
-                                                        }
-                                                      }
                                                     }
+                                                    // Tại sao setState lại không chạy được ở đây nhỉ ? Vì
+
+                                                    isLoading = true;
                                                   },
 
                                                   // ignore: sort_child_properties_last
-                                                  child: const Text(
-                                                    "ĐĂNG KÝ",
-                                                    style: TextStyle(
-                                                        color: Colors.white),
-                                                  ),
+                                                  child: isLoading
+                                                      ? const Text(
+                                                          'Đăng kí',
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.white),
+                                                        )
+                                                      : const CircularProgressIndicator(),
                                                   style: TextButton.styleFrom(
                                                     backgroundColor:
                                                         const Color.fromARGB(
                                                             255, 252, 188, 215),
                                                   )),
                                             ),
-                                            // TextButton(
-                                            //     onPressed: () {},
-                                            //     // ignore: sort_child_properties_last
-                                            //     child: const Text(
-                                            //       "ĐĂNG KÝ",
-                                            //       style: TextStyle(color: Colors.white),
-                                            //     ),
-                                            //     style: TextButton.styleFrom(
-                                            //       backgroundColor: const Color.fromARGB(
-                                            //           255, 252, 188, 215),
-                                            //     )),
                                           ],
                                         ),
-                                        const SizedBox(height: 20),
+                                        //const SizedBox(height: 20),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            TextButton(
+                                                onPressed: () {
+                                                  Navigator.pushNamed(context,
+                                                      LoginPageNail.routerName);
+                                                },
+                                                child: const Text("Đăng nhập"))
+                                          ],
+                                        )
                                       ],
                                     ),
                                   ),
@@ -401,4 +499,23 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 }
 
+bool checkEmail(String email) {
+  if (!email.contains('@gmail.com')) {
+    return false;
+  }
+  return true;
+}
 
+bool checkPassword(String pass, String passConfirm) {
+  if (pass != passConfirm) {
+    return false;
+  }
+  return true;
+}
+
+bool checkNull(String phone, String name, String pass, String email) {
+  if (phone.isEmpty || name.isEmpty || pass.isEmpty || email.isEmpty) {
+    return false;
+  }
+  return true;
+}

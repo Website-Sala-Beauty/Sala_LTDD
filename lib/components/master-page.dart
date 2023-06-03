@@ -1,5 +1,6 @@
 // ignore_for_file: file_names
 
+import 'package:bill_app/pages/message-page.dart';
 import 'package:bill_app/pages/resources/app-color.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -14,7 +15,8 @@ class MasterPage extends StatelessWidget {
   const MasterPage({
     super.key,
     this.body,
-    this.title, this.isBack,
+    this.title,
+    this.isBack,
   });
 
   @override
@@ -26,7 +28,7 @@ class MasterPage extends StatelessWidget {
             onPressed: () {
               Navigator.pop(context);
             },
-            icon:  Icon( isBack ?? true ? Icons.arrow_back_ios : null,
+            icon: Icon(isBack ?? true ? Icons.arrow_back_ios : null,
                 size: 30.0, color: AppColor.white)),
         title: Text(title ?? 'Sala Nail',
             style: const TextStyle(fontSize: 25, fontFamily: 'RobotoMono')),
@@ -55,10 +57,17 @@ class MasterPage extends StatelessWidget {
                 iconSize: MediaQuery.of(context).size.height / 30,
                 //padding: const EdgeInsets.only(right: 28.0),
                 icon: const Icon(
-                  Icons.search,
+                  Icons.message,
                   color: Color.fromARGB(255, 243, 180, 201),
                 ),
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const MesagePage(),
+                    ),
+                  );
+                },
               ),
               const SizedBox(width: 20.0),
               IconButton(

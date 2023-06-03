@@ -3,6 +3,7 @@
 import 'package:bill_app/components/custom-text-file-form.dart';
 import 'package:bill_app/pages/home-screen.dart';
 import 'package:bill_app/pages/register-page.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -24,6 +25,8 @@ class _LoginPageNailState extends State<LoginPageNail> {
   bool _isPassword = true;
   bool isCheckPassword = false;
   bool isCheckUserName = false;
+  bool isLoading = true;
+
   @override
   Widget build(BuildContext context) {
     return
@@ -102,8 +105,8 @@ class _LoginPageNailState extends State<LoginPageNail> {
                                           suffixIcon: IconButton(
                                             icon: Icon(
                                               _isPassword
-                                                  ? Icons.visibility
-                                                  : Icons.visibility_off,
+                                                  ? Icons.visibility_off
+                                                  : Icons.visibility,
                                               color: const Color.fromARGB(
                                                   255, 93, 166, 173),
                                             ),
@@ -121,64 +124,121 @@ class _LoginPageNailState extends State<LoginPageNail> {
                                       ),
                                       Row(
                                         mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          Visibility(
+                                            visible: isCheckPassword,
+                                            child: const Text(
+                                              "Mật khẩu không được để trống",
+                                              style:
+                                                  TextStyle(color: Colors.red),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
                                             MainAxisAlignment.spaceAround,
                                         children: [
                                           TextButton(
                                               onPressed: () async {
-                                                try {
-                                                  final userCredential = await _firebase
-                                                      .signInWithEmailAndPassword(
-                                                          email:
-                                                              userNameController
-                                                                  .text
-                                                                  .trim(),
-                                                          password:
-                                                              passwordController
-                                                                  .text
-                                                                  .trim());
-                                                  Navigator.pushAndRemoveUntil(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              const HomePage()),
-                                                      (route) => false);
-                                                } on FirebaseAuthException catch (e) {
-                                                  if (e.code ==
-                                                      'user-not-found') {
-                                                    ScaffoldMessenger.of(
-                                                            context)
-                                                        .showSnackBar(
-                                                      const SnackBar(
-                                                        content: Text(
-                                                            'Email không tồn tại'),
-                                                      ),
-                                                    );
-                                                  } else if (e.code ==
-                                                      'wrong-password') {
-                                                    ScaffoldMessenger.of(
-                                                            context)
-                                                        .showSnackBar(
-                                                      const SnackBar(
-                                                        content: Text(
-                                                            'Sai tên đăng nhập hoặc mật khẩu'),
-                                                      ),
-                                                    );
-                                                  }
-                                                }
+                                                String userName =
+                                                    userNameController.text;
+                                                String password =
+                                                    passwordController.text;
 
-                                                // _firebase.
-                                                // String userName =
-                                                //     userNameController.text;
-                                                // String password =
-                                                //     passwordController.text;
-                                                // checkLogin(userName, password);
+                                                if (checkNull(
+                                                    userName, password)) {
+                                                  try {
+                                                    final user = FirebaseAuth
+                                                        .instance.currentUser;
+                                                    setState(() {
+                                                      isLoading = false;
+                                                    });
+                                                    final userData =
+                                                        await FirebaseFirestore
+                                                            .instance
+                                                            .collection(
+                                                                'tb_User')
+                                                            .doc(user!.uid)
+                                                            .get();
+                                                    if (userName ==
+                                                            userData['email'] &&
+                                                        password ==
+                                                            userData[
+                                                                'password']) {
+                                                      ScaffoldMessenger.of(
+                                                              context)
+                                                          .showSnackBar(
+                                                        const SnackBar(
+                                                          content: Text(
+                                                              'Đăng nhập thành công'),
+                                                        ),
+                                                      );
+
+                                                      Navigator.pushAndRemoveUntil(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder: (context) =>
+                                                                  const HomePage()),
+                                                          (route) => false);
+                                                    } else {
+                                                      setState(() {
+                                                        isLoading = true;
+                                                      });
+                                                      ScaffoldMessenger.of(
+                                                              context)
+                                                          .showSnackBar(
+                                                        const SnackBar(
+                                                          content: Text(
+                                                              'Sai tên đăng nhập hoặc mật khẩu'),
+                                                        ),
+                                                      );
+                                                    }
+                                                  } on FirebaseAuthException catch (e) {
+                                                    if (e.code ==
+                                                        'user-not-found') {
+                                                      ScaffoldMessenger.of(
+                                                              context)
+                                                          .showSnackBar(
+                                                        const SnackBar(
+                                                          content: Text(
+                                                              'Email không tồn tại'),
+                                                        ),
+                                                      );
+                                                    } else if (e.code ==
+                                                        'wrong-password') {
+                                                      ScaffoldMessenger.of(
+                                                              context)
+                                                          .showSnackBar(
+                                                        const SnackBar(
+                                                          content: Text(
+                                                              'Sai tên đăng nhập hoặc mật khẩu'),
+                                                        ),
+                                                      );
+                                                    }
+                                                  }
+                                                } else {
+                                                  setState(() {
+                                                    isLoading = true;
+                                                    isCheckUserName =
+                                                        userName.isEmpty;
+                                                    isCheckPassword =
+                                                        password.isEmpty;
+                                                  });
+                                                }
+                                                isLoading = true;
                                               },
                                               // ignore: sort_child_properties_last
-                                              child: const Text(
-                                                "ĐĂNG NHẬP",
-                                                style: TextStyle(
-                                                    color: Colors.white),
-                                              ),
+                                              child: isLoading
+                                                  ? const Text(
+                                                      "ĐĂNG NHẬP",
+                                                      style: TextStyle(
+                                                          color: Colors.white),
+                                                    )
+                                                  : const CircularProgressIndicator(
+                                                      color: Colors.white,
+                                                    ),
                                               style: TextButton.styleFrom(
                                                 backgroundColor:
                                                     const Color.fromARGB(
@@ -237,39 +297,11 @@ class _LoginPageNailState extends State<LoginPageNail> {
       ),
     );
   }
+}
 
-  void checkLogin(String userName, String password) {
-    if (userName.isEmpty) {
-      setState(() {
-        isCheckUserName = true;
-      });
-    } else {
-      setState(() {
-        isCheckUserName = false;
-      });
-    }
-    if (password.isEmpty) {
-      setState(() {
-        isCheckPassword = true;
-      });
-    } else {
-      setState(() {
-        isCheckPassword = false;
-      });
-    }
-    if (userName.isNotEmpty && password.isNotEmpty) {
-      if (userName == "123" && password == "123") {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const HomePage()),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Sai tên đăng nhập hoặc mật khẩu'),
-          ),
-        );
-      }
-    }
+bool checkNull(String email, String password) {
+  if (email.isEmpty || password.isEmpty) {
+    return false;
   }
+  return true;
 }

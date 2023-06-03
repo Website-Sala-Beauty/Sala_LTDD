@@ -1,3 +1,6 @@
+import 'package:bill_app/pages/bill-screen.dart';
+import 'package:bill_app/pages/resources/coming-soon.dart';
+import 'package:bill_app/pages/statistics-screen.dart';
 import 'package:flutter/material.dart';
 
 import '../models/function-home.dart';
@@ -35,12 +38,12 @@ class itemHome extends StatelessWidget {
           image: 'assets/images/function-home-images/service.png'),
       FunctionHome(
           id: 7,
-          name: 'Thông tin Bill',
-          image: 'assets/images/function-home-images/thong-tin-bill.png'),
+          name: 'Hóa đơn',
+          image: 'assets/images/function-home-images/feedback.png'),
       FunctionHome(
           id: 8,
-          name: 'Góp ý',
-          image: 'assets/images/function-home-images/feedback.png'),
+          name: 'Thông tin Bill',
+          image: 'assets/images/function-home-images/thong-tin-bill.png'),
     ];
 
     return Container(
@@ -64,42 +67,63 @@ class itemHome extends StatelessWidget {
             ),
             itemCount: listFunc.length,
             itemBuilder: (BuildContext ctx, index) {
-              return Column(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: Colors.white,
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Color.fromARGB(66, 126, 123, 123),
-                          blurRadius: 5,
-                          spreadRadius: 2,
-                          offset: Offset(0, 3),
-                        ),
-                      ],
-                    ),
-                    child: Image.asset(
-                      listFunc[index].image ?? '',
-                      fit: BoxFit.cover,
-                      height: MediaQuery.of(context).size.height / 20,
-                      width: MediaQuery.of(context).size.height / 20,
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: Text(
-                      listFunc[index].name ?? '',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: MediaQuery.of(context).size.height / 80,
-                        fontWeight: FontWeight.bold,
+              return GestureDetector(
+                onTap: () {
+                  switch (listFunc[index].id) {
+                    case 7:
+                      {
+                        Navigator.pushNamed(context, BillPage.routerName);
+                        break;
+                      }
+                    case 8:
+                      {
+                        Navigator.pushNamed(context, StatisticsPage.routerName);
+                        break;
+                      }
+
+                    default:
+                      {
+                        Navigator.pushNamed(context, ComingSoonPage.routerName);
+                      }
+                  }
+                },
+                child: Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Colors.white,
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Color.fromARGB(66, 126, 123, 123),
+                            blurRadius: 5,
+                            spreadRadius: 2,
+                            offset: Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: Image.asset(
+                        listFunc[index].image ?? '',
+                        fit: BoxFit.cover,
+                        height: MediaQuery.of(context).size.height / 20,
+                        width: MediaQuery.of(context).size.height / 20,
                       ),
                     ),
-                  ),
-                ],
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Text(
+                        listFunc[index].name ?? '',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: MediaQuery.of(context).size.height / 80,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               );
             }),
       ),

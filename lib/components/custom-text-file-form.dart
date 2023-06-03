@@ -32,7 +32,7 @@ class CustomTextFiled extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      obscureText: isPassword,
+      obscureText: isPassword, 
       controller: controller,
       textInputAction: textInputAction,
       onEditingComplete: onEditingComplete,

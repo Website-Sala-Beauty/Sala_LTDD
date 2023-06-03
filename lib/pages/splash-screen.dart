@@ -3,16 +3,12 @@
 
 import 'dart:async';
 
-import 'package:bill_app/pages/home-screen.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
-import 'login-page-salanail.dart';
-
 
 class TimerPage extends StatefulWidget {
-    static const routerName = '/splash';
+  static const routerName = '/splash';
 
   const TimerPage({super.key});
 
@@ -29,21 +25,10 @@ class _TimerPageState extends State<TimerPage> {
     });
   }
 
-  void checkLoginStatus() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    if (prefs.containsKey('user')) {
-      // final jsonString = prefs.getString('user');
-      // final map = jsonDecode(jsonString);
-      // User user = User.fromJson(map);
-      // Đăng nhập tự động thành công, chuyển hướng đến màn hình chính
-      Navigator.of(context).pushReplacementNamed(
-        HomePage.routerName,
-      );
-    } else {
-      // Không có thông tin đăng nhập, chuyển hướng đến màn hình đăng nhập
-      Navigator.of(context).pushReplacementNamed(
-       LoginPageNail.routerName,
-      ); // pushReplacement là 
+  void checkLoginStatus() {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      Navigator.pushReplacementNamed(context, '/home-page');
     }
   }
 
