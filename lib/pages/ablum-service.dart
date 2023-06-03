@@ -7,11 +7,11 @@ import '../components/master-page.dart';
 import 'package:http/http.dart' as http;
 
 // ignore: must_be_immutable
-class AblumSanPhamPage extends StatelessWidget {
-  static const String routerName = '/album-page';
+class ServiceAblumPage extends StatelessWidget {
+  static const String routerName = '/service-page';
   // ignore: prefer_const_constructors_in_immutables
-  AblumSanPhamPage({super.key});
-
+  ServiceAblumPage({super.key});
+ 
   @override
   Widget build(BuildContext context) {
     final productData = Provider.of<Products>(context);
@@ -29,9 +29,6 @@ class AblumSanPhamPage extends StatelessWidget {
           products[index].id,
           products[index].image,
           products[index].name,
-          products[index].price,
-          products[index].description,
-          products[index].quantity,
         ),
       ),
     );
@@ -42,21 +39,12 @@ class SanPham extends StatelessWidget {
   String? id;
   String? image;
   String? name;
-  double? price;
-  String? description;
-  int? quantity;
-  SanPham(String? id, String? image, String? name, double? price,
-      String? description, int? quantity,
-      {super.key}) {
+  SanPham(String? id, String? image, String? name, {super.key}) {
     this.id = id;
     this.image = image;
     this.name = name;
-    this.price = price;
-    this.description = description;
-    this.quantity = quantity;
   }
-  void addCart(String name, String image, double price, String description,
-      int quantity) async {
+  void addCart(String name, String image) async {
     final url = Uri.https(
         'salabeauty-42a26-default-rtdb.asia-southeast1.firebasedatabase.app',
         'tb_Cart.json');
@@ -64,9 +52,6 @@ class SanPham extends StatelessWidget {
         body: json.encode({
           'image': image,
           'name': name,
-          'price': price,
-          'description': description,
-          'quantity': quantity,
         }));
     print(respone.statusCode);
   }
@@ -97,7 +82,7 @@ class SanPham extends StatelessWidget {
           ),
           trailing: IconButton(
             onPressed: () {
-              addCart(name ?? '', image ?? '', price!, description!, quantity!);
+              addCart(name ?? '', image ?? '');
               SnackBar snackBar = const SnackBar(
                 content: Text('Thêm vào giỏ hàng thành công'),
               );

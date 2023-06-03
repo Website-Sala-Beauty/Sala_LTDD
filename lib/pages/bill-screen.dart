@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:bill_app/components/container-test.dart';
 import 'package:bill_app/components/custom-button-bill.dart';
 import 'package:bill_app/components/custom_row_input.dart';
@@ -5,6 +7,7 @@ import 'package:bill_app/models/bill-model.dart';
 import 'package:bill_app/pages/resources/app-color.dart';
 import 'package:bill_app/services/local/shared_perferences.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 //final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
@@ -31,9 +34,11 @@ class _BillPage extends State<BillPage> {
   void initState() {
     super.initState();
     thanhTienViController.text = bill.totalBill.toStringAsFixed(3);
-
+  
     _getBills();
   }
+
+  
 
   double totalBill(double price, bool isValue, int donVi) {
     double total = 0.0;
