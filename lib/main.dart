@@ -1,5 +1,5 @@
 import 'package:bill_app/pages/forgot-pass.dart';
-import 'package:bill_app/components/profile-custom.dart';
+import 'package:bill_app/pages/profile-page.dart';
 import 'package:bill_app/pages/splash-screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';

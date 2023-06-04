@@ -8,9 +8,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../pages/login-page-salanail.dart';
 import '../pages/profile-page.dart';
-import 'profile-custom.dart';
 
 class MasterPage extends StatefulWidget {
   final String? title;
@@ -30,14 +28,6 @@ class MasterPage extends StatefulWidget {
 
 class _MasterPageState extends State<MasterPage> {
   // Load ảnh từ tb_User đổ vào biến
-  String? _image;
-  void getAnh() async {
-    _image = await FirebaseStorage.instance
-        .ref()
-        .child('tb_User')
-        .child(FirebaseAuth.instance.currentUser!.uid)
-        .getDownloadURL();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -117,7 +107,7 @@ class _MasterPageState extends State<MasterPage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => ProfileCustom(),
+                        builder: (context) => const ProfilePage(),
                       ),
                     );
                     // hiện thông báo xác nhận đăng xuất
