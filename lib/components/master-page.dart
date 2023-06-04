@@ -1,13 +1,18 @@
-// ignore_for_file: file_names
+// ignore_for_file: file_names, use_build_context_synchronously
 
+import 'package:bill_app/pages/home-screen.dart';
 import 'package:bill_app/pages/message-page.dart';
 import 'package:bill_app/pages/resources/app-color.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../pages/login-page-salanail.dart';
+import '../pages/profile-page.dart';
+import 'profile-custom.dart';
 
-class MasterPage extends StatelessWidget {
+class MasterPage extends StatefulWidget {
   final String? title;
   final bool? isBack;
   // tham số truyền vào là nội dung của body  là file CustomBottomAppBar
@@ -20,20 +25,35 @@ class MasterPage extends StatelessWidget {
   });
 
   @override
+  State<MasterPage> createState() => _MasterPageState();
+}
+
+class _MasterPageState extends State<MasterPage> {
+  // Load ảnh từ tb_User đổ vào biến
+  String? _image;
+  void getAnh() async {
+    _image = await FirebaseStorage.instance
+        .ref()
+        .child('tb_User')
+        .child(FirebaseAuth.instance.currentUser!.uid)
+        .getDownloadURL();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 237, 238, 240),
       appBar: AppBar(
-        leading: IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: Icon(isBack ?? true ? Icons.arrow_back_ios : null,
-                size: 30.0, color: AppColor.white)),
-        title: Text(title ?? 'Sala Nail',
-            style: const TextStyle(fontSize: 25, fontFamily: 'RobotoMono')),
-        backgroundColor: const Color.fromARGB(181, 254, 124, 163),
+        backgroundColor: const Color(0xFFF3D1DC),
+        title: Text(
+          widget.title ?? 'Sala Nail',
+          style: const TextStyle(
+              color: Color(0xFF893F3F), fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true,
+        titleSpacing: 0.0,
       ),
+
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: BottomAppBar(
         shape: const CircularNotchedRectangle(), //
@@ -51,7 +71,14 @@ class MasterPage extends StatelessWidget {
                   Icons.home,
                   color: Color.fromARGB(255, 243, 180, 201),
                 ),
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const HomePage(),
+                    ),
+                  );
+                },
               ),
               IconButton(
                 iconSize: MediaQuery.of(context).size.height / 30,
@@ -80,56 +107,27 @@ class MasterPage extends StatelessWidget {
                 onPressed: () {},
               ),
               IconButton(
-                iconSize: MediaQuery.of(context).size.height / 30,
-                //padding: const EdgeInsets.only(right: 28.0),
-                icon: const Icon(
-                  Icons.logout_outlined,
-                  color: Color.fromARGB(255, 243, 180, 201),
-                ),
-                onPressed: () async {
-                  // hiện thông báo xác nhận đăng xuất
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: const Text('Đăng xuất'),
-                        content: const Text('Bạn có muốn đăng xuất không?'),
-                        actions: <Widget>[
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: const Text('Hủy'),
-                          ),
-                          TextButton(
-                            onPressed: () async {
-                              SharedPreferences prefs =
-                                  await SharedPreferences.getInstance();
-                              await prefs.remove('user');
-                              Route route = MaterialPageRoute(
-                                builder: (context) => const LoginPageNail(),
-                              );
-                              // ignore: use_build_context_synchronously
-                              Navigator.pushAndRemoveUntil(
-                                context,
-                                route,
-                                (Route<dynamic> route) => false,
-                              );
-                            },
-                            child: const Text('Đăng xuất'),
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                },
-              ),
+                  iconSize: MediaQuery.of(context).size.height / 30,
+                  //padding: const EdgeInsets.only(right: 28.0),
+                  icon: const Icon(
+                    Icons.people,
+                    color: Color.fromARGB(255, 243, 180, 201),
+                  ),
+                  onPressed: () async {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ProfileCustom(),
+                      ),
+                    );
+                    // hiện thông báo xác nhận đăng xuất
+                  }),
               const SizedBox(),
             ],
           ),
         ),
       ),
-      body: body,
+      body: widget.body,
       // không bị đẩy khi hiển thị bàn phím
       resizeToAvoidBottomInset: false,
 

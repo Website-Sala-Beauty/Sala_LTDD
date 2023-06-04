@@ -1,12 +1,13 @@
 // ignore_for_file: use_build_context_synchronously
 
-import 'package:bill_app/pages/resources/app-color.dart';
+import 'dart:convert';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
 
-import '../components/custom-text-file-form.dart';
 import 'login-page-salanail.dart';
 
 final _firebase = FirebaseAuth.instance;
@@ -29,7 +30,6 @@ class _RegisterPageState extends State<RegisterPage> {
   bool passwordTextConfirm = true;
   bool isLoading = true;
 
-  TextEditingController phoneNumberController = TextEditingController();
   TextEditingController userNameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
@@ -39,6 +39,20 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   void initState() {
     super.initState();
+  }
+
+  Future<bool> validateCredentials(String email) async {
+    String url =
+        'https://api.hunter.io/v2/email-verifier?email=$email&api_key=1d9d1db36a1c0d90a7c3de73af46a7279f75f523';
+
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return data['data']['result'] == 'deliverable';
+    } else {
+      throw Exception('Failed to check email validity');
+    }
   }
 
   @override
@@ -78,35 +92,23 @@ class _RegisterPageState extends State<RegisterPage> {
                                     key: _formKey,
                                     child: Column(
                                       children: [
-                                        CustomTextFiled(
-                                          controller: phoneNumberController,
-                                          text: "Số điện thoại",
-                                          textInputType: TextInputType.phone,
-                                        ),
-                                        const SizedBox(
-                                          height: 10,
-                                        ),
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          children: [
-                                            Visibility(
-                                              visible: isCheckPhoneNumber,
-                                              child: const Text(
-                                                "SDT không được để trống",
-                                                style: TextStyle(
-                                                    color: Colors.red),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(
-                                          height: 10,
-                                        ),
-                                        CustomTextFiled(
+                                        // CustomTextFiled(
+                                        //   controller: userNameController,
+                                        //   text: "Họ & Tên ",
+                                        //   textInputType: TextInputType.name,
+                                        // ),
+                                        TextField(
                                           controller: userNameController,
-                                          text: "Họ & Tên ",
-                                          textInputType: TextInputType.name,
+                                          onChanged: (value) => setState(() {
+                                            if (value.isEmpty) {
+                                              isCheckName = true;
+                                            } else {
+                                              isCheckName = false;
+                                            }
+                                          }),
+                                          decoration: const InputDecoration(
+                                            labelText: 'Họ và tên',
+                                          ),
                                         ),
                                         const SizedBox(
                                           height: 10,
@@ -128,11 +130,20 @@ class _RegisterPageState extends State<RegisterPage> {
                                         const SizedBox(
                                           height: 10,
                                         ),
-                                        CustomTextFiled(
+                                        TextField(
                                           controller: emailController,
-                                          text: "Email",
-                                          textInputType:
-                                              TextInputType.emailAddress,
+                                          onChanged: (value) => setState(() {
+                                            if (value.contains('@') &&
+                                                value.contains('.')) {
+                                              isCheckEmail = false;
+                                            } else {
+                                              isCheckEmail = true;
+                                            }
+                                          }),
+                                          textInputAction: TextInputAction.done,
+                                          decoration: const InputDecoration(
+                                            labelText: 'Email',
+                                          ),
                                         ),
                                         const SizedBox(
                                           height: 10,
@@ -144,7 +155,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                             Visibility(
                                               visible: isCheckEmail,
                                               child: const Text(
-                                                "Email không được để trống",
+                                                "Email không đúng định dạng",
                                                 style: TextStyle(
                                                     color: Colors.red),
                                               ),
@@ -157,14 +168,14 @@ class _RegisterPageState extends State<RegisterPage> {
                                         TextField(
                                           obscureText: passwordText,
                                           controller: passwordController,
+                                          onChanged: (value) => setState(() {
+                                            if (value.length < 6) {
+                                              isCheckPassword = true;
+                                            } else {
+                                              isCheckPassword = false;
+                                            }
+                                          }),
                                           textInputAction: TextInputAction.done,
-                                          onEditingComplete: () {
-                                            // String userName =
-                                            //     userNameController.text;
-                                            // String password =
-                                            //     passwordController.text;
-                                            // checkLogin(userName, password);
-                                          },
                                           decoration: InputDecoration(
                                             suffixIcon: IconButton(
                                               icon: Icon(
@@ -183,24 +194,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                             labelText: 'Password',
                                           ),
                                         ),
-                                        // CustomTextFiled(
-                                        //   controller: passwordController,
-                                        //   text: "Mật khẩu",
-                                        //   obscureText: true,
-                                        // ),
-                                        const SizedBox(
-                                          height: 7,
-                                        ),
-                                        Row(
-                                          children: const [
-                                            Text(
-                                              "Mật khẩu phải chứa ít nhất 6 kí tự.",
-                                              style: TextStyle(
-                                                  color: Color.fromARGB(
-                                                      255, 10, 10, 10)),
-                                            ),
-                                          ],
-                                        ),
+
                                         const SizedBox(
                                           height: 10,
                                         ),
@@ -211,7 +205,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                             Visibility(
                                               visible: isCheckPassword,
                                               child: const Text(
-                                                "Mật khẩu không được để trống",
+                                                "Mật khẩu chứa ít nhất 6 kí tự",
                                                 style: TextStyle(
                                                     color: Colors.red),
                                               ),
@@ -221,17 +215,19 @@ class _RegisterPageState extends State<RegisterPage> {
                                         const SizedBox(
                                           height: 10,
                                         ),
+
                                         TextField(
                                           obscureText: passwordTextConfirm,
                                           controller: confirmPasswordController,
-                                          textInputAction: TextInputAction.done,
-                                          onEditingComplete: () {
-                                            // String userName =
-                                            //     userNameController.text;
-                                            // String password =
-                                            //     passwordController.text;
-                                            // checkLogin(userName, password);
-                                          },
+                                          onChanged: (value) => setState(() {
+                                            if (value !=
+                                                passwordController.text) {
+                                              isCheckPasswordConfirm = true;
+                                            } else {
+                                              isCheckPasswordConfirm = false;
+                                            }
+                                            // isCheckPasswordConfirm = false;
+                                          }),
                                           decoration: InputDecoration(
                                             suffixIcon: IconButton(
                                               icon: Icon(
@@ -251,11 +247,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                             labelText: 'Xác nhận mật khẩu',
                                           ),
                                         ),
-                                        // CustomTextFiled(
-                                        //   controller: confirmPasswordController,
-                                        //   text: "Xác nhận mật khẩu ",
-                                        //   obscureText: true,
-                                        // ),
+
                                         const SizedBox(
                                           height: 7,
                                         ),
@@ -280,9 +272,6 @@ class _RegisterPageState extends State<RegisterPage> {
                                             Expanded(
                                               child: TextButton(
                                                   onPressed: () async {
-                                                    String phone =
-                                                        phoneNumberController
-                                                            .text;
                                                     String name =
                                                         userNameController.text;
                                                     String pass =
@@ -291,131 +280,129 @@ class _RegisterPageState extends State<RegisterPage> {
                                                         emailController.text;
                                                     String password =
                                                         passwordController.text;
-                                                    String passConfirm =
-                                                        confirmPasswordController
-                                                            .text;
 
-                                                    if (_formKey.currentState!
-                                                            .validate() &&
-                                                        checkNull(phone, name,
-                                                            pass, email)) {
-                                                      // Hàm check mail có đúng định dạng hay không
+                                                    if (checkNull(name)) {
+                                                      setState(() {
+                                                        isLoading = false;
+                                                      });
+                                                      //       true;
+                                                      bool isEmailValid =
+                                                          await validateCredentials(
+                                                              email
+                                                                  .toLowerCase());
+                                                      if (isEmailValid) {
+                                                        try {
+                                                          final userCredentials =
+                                                              await _firebase
+                                                                  .createUserWithEmailAndPassword(
+                                                                      email:
+                                                                          email,
+                                                                      password:
+                                                                          password);
+                                                          setState(() {
+                                                            isLoading = false;
+                                                          });
+                                                          await FirebaseFirestore
+                                                              .instance
+                                                              .collection(
+                                                                  'tb_User')
+                                                              .doc(
+                                                                  userCredentials
+                                                                      .user!
+                                                                      .uid)
+                                                              .set({
+                                                            'id':
+                                                                userCredentials
+                                                                    .user!.uid,
+                                                            'name': name,
+                                                            //'email': email,
+                                                            /// 'password': password,
+                                                            'image':
+                                                                userNameController
+                                                                    .text[0]
+                                                                    .toUpperCase(),
+                                                          });
+                                                          // Đưa email sang  trang login
 
-                                                      if (checkPassword(
-                                                          password,
-                                                          passConfirm)) {
-                                                        isCheckPasswordConfirm =
-                                                            true;
-                                                        if (checkEmail(email)) {
-                                                          try {
-                                                            final userCredentials =
-                                                                await _firebase.createUserWithEmailAndPassword(
-                                                                    email:
-                                                                        emailController
-                                                                            .text,
-                                                                    password:
-                                                                        passwordController
-                                                                            .text);
-                                                            setState(() {
-                                                              isLoading = false;
-                                                            });
-                                                            await FirebaseFirestore
-                                                                .instance
-                                                                .collection(
-                                                                    'tb_User')
-                                                                .doc(
-                                                                    userCredentials
-                                                                        .user!
-                                                                        .uid)
-                                                                .set({
-                                                              'name':
-                                                                  userNameController
-                                                                      .text,
-                                                              'email':
-                                                                  emailController
-                                                                      .text,
-                                                              'phone':
-                                                                  phoneNumberController
-                                                                      .text,
-                                                              'password':
-                                                                  passwordController
-                                                                      .text,
-                                                              'image':
-                                                                  userNameController
-                                                                      .text[0]
-                                                                      .toUpperCase(),
-                                                            });
-                                                            ScaffoldMessenger
-                                                                    .of(context)
-                                                                .showSnackBar(
-                                                              const SnackBar(
-                                                                content: Text(
-                                                                    'Đăng kí thành công'),
-                                                              ),
-                                                            );
-                                                            Navigator.pushNamed(
-                                                                context,
-                                                                LoginPageNail
-                                                                    .routerName);
-                                                          } on FirebaseAuthException catch (e) {
-                                                            if (e.code ==
-                                                                'weak-password') {
-                                                              ScaffoldMessenger
-                                                                      .of(context)
-                                                                  .showSnackBar(
-                                                                const SnackBar(
-                                                                  content: Text(
-                                                                      "Mật khẩu phải chứa ít nhất 6 kí tự."),
-                                                                ),
-                                                              );
-
-                                                              // print(
-                                                              //     'The password provided is too weak.');
-                                                            } else if (e.code ==
-                                                                'email-already-in-use') {
-                                                              ScaffoldMessenger
-                                                                      .of(context)
-                                                                  .showSnackBar(
-                                                                const SnackBar(
-                                                                  content: Text(
-                                                                      "Email đã tồn tại."),
-                                                                ),
-                                                              );
-                                                            }
-                                                            setState(() {
-                                                              isLoading = true;
-                                                            });
-                                                          } catch (e) {
-                                                            print(e);
-                                                          }
-                                                        } else {
                                                           ScaffoldMessenger.of(
                                                                   context)
                                                               .showSnackBar(
                                                             const SnackBar(
                                                               content: Text(
-                                                                  "Email không đúng định dạng."),
+                                                                  'Đăng kí thành công'),
                                                             ),
                                                           );
+                                                          // Đưa email sang  trang login bằng cách dùng Navigator và pushNamed để đưa qua trang login
+                                                          Navigator.pushNamed(
+                                                              context,
+                                                              LoginPageNail
+                                                                  .routerName);
+                                                        } on FirebaseAuthException catch (e) {
+                                                          // Email không tồn tại
+                                                          if (e.code ==
+                                                              'user-not-found') {
+                                                            ScaffoldMessenger
+                                                                    .of(context)
+                                                                .showSnackBar(
+                                                              const SnackBar(
+                                                                content: Text(
+                                                                    "Email không tồn tại."),
+                                                              ),
+                                                            );
+                                                          }
+                                                          if (e.code ==
+                                                              'email-already-in-use') {
+                                                            ScaffoldMessenger
+                                                                    .of(context)
+                                                                .showSnackBar(
+                                                              const SnackBar(
+                                                                content: Text(
+                                                                    "Email đã tồn tại."),
+                                                              ),
+                                                            );
+                                                          }
+                                                          setState(() {
+                                                            isLoading = true;
+                                                          });
+                                                        } catch (e) {
+                                                          print(e);
                                                         }
                                                       } else {
-                                                        ScaffoldMessenger.of(
-                                                                context)
-                                                            .showSnackBar(
-                                                          const SnackBar(
-                                                            content: Text(
-                                                                "Mật khẩu không khớp."),
-                                                          ),
+                                                        setState(() {
+                                                          isLoading = true;
+                                                        });
+                                                        showDialog(
+                                                          context: context,
+                                                          builder: (BuildContext
+                                                              context) {
+                                                            return AlertDialog(
+                                                              title: const Text(
+                                                                  'Thông báo'),
+                                                              content: const Text(
+                                                                  'Địa chỉ email không tồn tại. Vui lòng kiểm tra lại.'),
+                                                              actions: [
+                                                                TextButton(
+                                                                  onPressed:
+                                                                      () {
+                                                                    Navigator.of(
+                                                                            context)
+                                                                        .pop();
+                                                                  },
+                                                                  child:
+                                                                      const Text(
+                                                                          'Đóng'),
+                                                                ),
+                                                              ],
+                                                            );
+                                                          },
                                                         );
                                                       }
+                                                    }
 
-                                                      // kiểm tra các điều kiện nhập vào có đúng hay không vd:
-                                                    } else {
+                                                    // kiểm tra các điều kiện nhập vào có đúng hay không vd:
+                                                    else {
                                                       setState(() {
                                                         isLoading = true;
-                                                        isCheckPhoneNumber =
-                                                            phoneNumberController
-                                                                .text.isEmpty;
                                                         isCheckName =
                                                             userNameController
                                                                 .text.isEmpty;
@@ -513,8 +500,8 @@ bool checkPassword(String pass, String passConfirm) {
   return true;
 }
 
-bool checkNull(String phone, String name, String pass, String email) {
-  if (phone.isEmpty || name.isEmpty || pass.isEmpty || email.isEmpty) {
+bool checkNull(String name) {
+  if (name.isEmpty) {
     return false;
   }
   return true;

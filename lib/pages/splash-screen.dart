@@ -26,9 +26,11 @@ class _TimerPageState extends State<TimerPage> {
   }
 
   void checkLoginStatus() {
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      Navigator.pushReplacementNamed(context, '/home-page');
+    // Kiểm tra xem người dùng đã đăng nhập hay chưa
+    if (FirebaseAuth.instance.currentUser != null) {
+      Navigator.of(context).pushReplacementNamed('/home-page');
+    } else {
+      Navigator.of(context).pushReplacementNamed('/login-page');
     }
   }
 

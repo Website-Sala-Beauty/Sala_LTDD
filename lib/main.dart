@@ -1,4 +1,5 @@
-import 'package:bill_app/pages/profile-page.dart';
+import 'package:bill_app/pages/forgot-pass.dart';
+import 'package:bill_app/components/profile-custom.dart';
 import 'package:bill_app/pages/splash-screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -46,7 +47,7 @@ class MyApp extends StatelessWidget {
           theme: ThemeData(
             primarySwatch: Colors.blue,
           ),
-          home: const CartPage(),
+          home: const TimerPage(),
           // home: Details_Page(),
           routes: {
             '/register-page': (context) => const RegisterPage(),
@@ -58,6 +59,7 @@ class MyApp extends StatelessWidget {
             '/cart-page': (context) => const CartPage(),
             '/statistics-page': (context) => const StatisticsPage(),
             '/coming-soon': (context) => const ComingSoonPage(),
+            '/forgot-pass': (context) => const ForgotPassword(),
           }
           // routes: {
           //   DetailProductPage.routerName: (context) =>  DetailProductPage()

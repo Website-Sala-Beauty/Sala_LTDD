@@ -14,14 +14,6 @@ class Products with ChangeNotifier {
     ),
     Product(
       id: "1",
-      name: 'Vẽ marble',
-      image:
-          'https://youngyogabeauty.com/wp-content/uploads/2021/06/nail-dinh-da-sang-trong-12.jpg',
-      description: 'Dịch vụ mới về',
-      price: 120.000,
-    ),
-    Product(
-      id: "1",
       name: 'Ombre',
       image:
           'https://antimatter.vn/wp-content/uploads/2022/05/mau-nail-mau-den.jpg',

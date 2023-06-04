@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:bill_app/components/custom-text-file-form.dart';
+import 'package:bill_app/pages/forgot-pass.dart';
 import 'package:bill_app/pages/home-screen.dart';
 import 'package:bill_app/pages/register-page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -65,10 +66,18 @@ class _LoginPageNailState extends State<LoginPageNail> {
                                 child: Form(
                                   child: Column(
                                     children: [
-                                      CustomTextFiled(
+                                      TextField(
                                         controller: userNameController,
-                                        text: "Email",
-                                        //  textInputType: TextInputType.phone,
+                                        onChanged: (value) => setState(() {
+                                          if (value.isEmpty) {
+                                            isCheckUserName = true;
+                                          } else {
+                                            isCheckUserName = false;
+                                          }
+                                        }),
+                                        decoration: const InputDecoration(
+                                          labelText: 'Email',
+                                        ),
                                       ),
                                       const SizedBox(
                                         height: 10,
@@ -80,7 +89,7 @@ class _LoginPageNailState extends State<LoginPageNail> {
                                           Visibility(
                                             visible: isCheckUserName,
                                             child: const Text(
-                                              "Tên đăng nhập không được để trống",
+                                              "Email không được để trống",
                                               style:
                                                   TextStyle(color: Colors.red),
                                             ),
@@ -93,14 +102,15 @@ class _LoginPageNailState extends State<LoginPageNail> {
                                       TextField(
                                         obscureText: _isPassword,
                                         controller: passwordController,
-                                        textInputAction: TextInputAction.done,
-                                        onEditingComplete: () {
-                                          // String userName =
-                                          //     userNameController.text;
-                                          // String password =
-                                          //     passwordController.text;
-                                          // checkLogin(userName, password);
-                                        },
+                                        onChanged: (value) => setState(() {
+                                          if (value !=
+                                              passwordController.text) {
+                                            isCheckPassword = true;
+                                          } else {
+                                            isCheckPassword = false;
+                                          }
+                                          // isCheckPasswordConfirm = false;
+                                        }),
                                         decoration: InputDecoration(
                                           suffixIcon: IconButton(
                                             icon: Icon(
@@ -116,7 +126,7 @@ class _LoginPageNailState extends State<LoginPageNail> {
                                               });
                                             },
                                           ),
-                                          labelText: 'Password',
+                                          labelText: 'Mật khẩu',
                                         ),
                                       ),
                                       const SizedBox(
@@ -150,23 +160,19 @@ class _LoginPageNailState extends State<LoginPageNail> {
                                                 if (checkNull(
                                                     userName, password)) {
                                                   try {
-                                                    final user = FirebaseAuth
-                                                        .instance.currentUser;
                                                     setState(() {
                                                       isLoading = false;
                                                     });
-                                                    final userData =
-                                                        await FirebaseFirestore
+                                                    UserCredential
+                                                        userCredential =
+                                                        await FirebaseAuth
                                                             .instance
-                                                            .collection(
-                                                                'tb_User')
-                                                            .doc(user!.uid)
-                                                            .get();
-                                                    if (userName ==
-                                                            userData['email'] &&
-                                                        password ==
-                                                            userData[
-                                                                'password']) {
+                                                            .signInWithEmailAndPassword(
+                                                                email: userName,
+                                                                password:
+                                                                    password);
+                                                    if (userCredential.user !=
+                                                        null) {
                                                       ScaffoldMessenger.of(
                                                               context)
                                                           .showSnackBar(
@@ -217,6 +223,9 @@ class _LoginPageNailState extends State<LoginPageNail> {
                                                         ),
                                                       );
                                                     }
+                                                    setState(() {
+                                                      isLoading = true;
+                                                    });
                                                   }
                                                 } else {
                                                   setState(() {
@@ -258,7 +267,10 @@ class _LoginPageNailState extends State<LoginPageNail> {
                                               },
                                               child: const Text("Đăng ký")),
                                           TextButton(
-                                              onPressed: () {},
+                                              onPressed: () {
+                                                Navigator.pushNamed(context,
+                                                    ForgotPassword.routerName);
+                                              },
                                               child:
                                                   const Text("Quên mật khẩu?")),
                                         ],

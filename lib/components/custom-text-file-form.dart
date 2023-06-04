@@ -9,7 +9,7 @@ class CustomTextFiled extends StatelessWidget {
   final IconData? iconSuffix;
   final String? text;
   final TextInputAction? textInputAction;
-  final VoidCallback? onEditingComplete;
+  final Function? onChanged;
   final TextInputType? textInputType;
   final bool? obscureText;
   final Function? validator;
@@ -23,7 +23,7 @@ class CustomTextFiled extends StatelessWidget {
       this.icon,
       this.text,
       this.textInputAction,
-      this.onEditingComplete,
+      this.onChanged,
       this.textInputType,
       this.obscureText,
       this.iconSuffix,
@@ -32,10 +32,10 @@ class CustomTextFiled extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      obscureText: isPassword, 
+      obscureText: isPassword,
       controller: controller,
       textInputAction: textInputAction,
-      onEditingComplete: onEditingComplete,
+      onChanged: (value) => onChanged,
       keyboardType: textInputType,
       decoration: InputDecoration(
         labelText: text ?? '',

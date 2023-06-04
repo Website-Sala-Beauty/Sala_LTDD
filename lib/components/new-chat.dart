@@ -16,13 +16,23 @@ class _NewChatState extends State<NewChat> {
   // @override
   // void initState() {
   //   super.initState();
-  //   FocusScope.of(context).unfocus();
+  //   // FocusScope.of(context).unfocus();
   // }
 
   @override
   void dispose() {
     newChatcontroller.dispose();
     super.dispose();
+  }
+
+  void removeAllChat() {
+    // Xóa tất cả bản ghi trong bảng tb_Chat
+    // xóa tất cả bản ghi trong bảng tb_Chat khi người dùng vào màn hình chat
+    FirebaseFirestore.instance.collection('tb_Chat').get().then((snapshot) {
+      for (DocumentSnapshot doc in snapshot.docs) {
+        doc.reference.delete();
+      }
+    });
   }
 
   void _submit() async {
